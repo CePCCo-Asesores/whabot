@@ -1,6 +1,6 @@
-# Chatbox Console
+# Whabot Console
 
-Frontend profesional para administrar el backend multi-tenant de Chatbox. Esta app consume exclusivamente endpoints existentes del backend; donde la API no expone datos, la UI muestra estados vacios y TODOs explicitos.
+Frontend independiente para administrar el backend multi-tenant de Chatbox. Esta app consume exclusivamente endpoints existentes del backend; donde la API no expone datos, la UI muestra estados vacios y TODOs explicitos.
 
 ## Stack
 
@@ -15,7 +15,6 @@ Frontend profesional para administrar el backend multi-tenant de Chatbox. Esta a
 ## Instalacion
 
 ```bash
-cd frontend
 npm install
 cp .env.example .env
 ```
@@ -29,6 +28,8 @@ VITE_DEV_PROXY_TARGET=http://localhost:3000
 
 En desarrollo, Vite proxy redirige `/api/*` a `http://localhost:3000/*`. Esto evita modificar CORS del backend, que hoy esta configurado como API privada sin browser CORS abierto.
 
+Para produccion, apunta `VITE_API_BASE_URL` al dominio real del backend Chatbox o usa un reverse proxy que publique `/api`.
+
 ## Scripts
 
 ```bash
@@ -36,14 +37,14 @@ npm run dev
 npm run build
 npm run lint
 npm run typecheck
+npm run preview
 ```
 
 ## Correr con backend local
 
-Terminal 1:
+Terminal 1, en el repo `chatbox`:
 
 ```bash
-cd ..
 npm install
 cp .env.example .env
 npm run db:generate
@@ -51,19 +52,25 @@ npm run db:migrate
 npm run dev
 ```
 
-Terminal 2:
+Terminal 2, en este repo `whabot`:
 
 ```bash
-cd frontend
+npm install
+cp .env.example .env
 npm run dev
 ```
 
 Abre `http://localhost:5173`.
 
+## Relacion con Chatbox
+
+- `chatbox`: backend/API, worker, Prisma, Redis, webhooks, OpenAPI y operaciones de plataforma.
+- `whabot`: consola web React/Vite que consume la API de `chatbox`.
+
 ## Seguridad frontend
 
 - El JWT se guarda en `sessionStorage`, no en `localStorage`, y se limpia ante `401`.
-- La `ADMIN_API_KEY` para `/metrics` se mantiene solo en memoria de la pestaña.
+- La `ADMIN_API_KEY` para `/metrics` se mantiene solo en memoria de la pestana.
 - API keys, access tokens y verify tokens se escriben al backend pero nunca se muestran completos.
 - Los errores visibles se reducen al mensaje del backend o un texto seguro.
 - Acciones destructivas usan confirmacion estricta cuando aplica.
@@ -71,7 +78,7 @@ Abre `http://localhost:5173`.
 
 ## OpenAPI client
 
-No se genero cliente OpenAPI automatico porque el repo expone la spec como objeto TypeScript en `src/openapi.ts`, no como JSON persistido ni pipeline de generacion. Se implemento un cliente centralizado tipado en `src/lib/resources.ts`, mapeado uno a uno contra rutas reales.
+No se genero cliente OpenAPI automatico porque el backend expone la spec como objeto TypeScript en `src/openapi.ts`, no como JSON persistido ni pipeline de generacion. Se implemento un cliente centralizado tipado en `src/lib/resources.ts`, mapeado uno a uno contra rutas reales.
 
 ## Endpoints usados
 
